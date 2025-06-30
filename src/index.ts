@@ -92,12 +92,49 @@ app.post("/api/v1/content", userMiddleware, async (req, res) => {
 
 });
 
-app.get("/api/v1/content", (req, res) => {
+app.get("/api/v1/content", userMiddleware, async(req, res) => {
+    //@ts-ignore
+    const { userId } = req;
 
+    try {
+      
+        const content = await ContentModel.find({ 
+            userId 
+        }).populate("userId");
+
+        res.status(200).json({ 
+            content 
+        });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ 
+            msg: "Server Crash!!" 
+        });
+    }
 });
 
-app.delete("/api/v1/content", (req, res) => {
+app.delete("/api/v1/content", userMiddleware, async(req, res) => {
+    //@ts-ignore
+    const { userId } = req;
+    const { contentId } = req.body;
 
+    try {
+        const result = await ContentModel.deleteOne({
+            _id: contentId,
+            userId
+        });
+     
+        res.status(200).json({ 
+            message: "SuccessFully Deleted!!" 
+        });
+        
+    } catch (error) {
+        console.error(error);
+        res.json({
+            message: "Server is crush"
+        })
+    }
 });
 
 app.post("/api/v1/brain/share", (req, res) => {
@@ -109,4 +146,4 @@ app.get("/api/v1/brain/:shareLink", (req, res) => {
 });
 
 
-app.listen(3001);
+app.listen(3000);

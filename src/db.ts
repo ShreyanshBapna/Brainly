@@ -44,11 +44,11 @@ const contentSchema = new Schema({
         require: true
     },
 
-    tags: [{type: Schema.Types.ObjectId, ref:'TagModel'}],
+    tags: [{type: Schema.Types.ObjectId, ref:'Tag'}],
     
     userId: {
         type: Schema.Types.ObjectId,
-        ref: 'UserModel', 
+        ref: 'User', 
         require: true
     }
 })
@@ -69,7 +69,7 @@ const linkSchema = new Schema({
     },
     userId: {
         type: Schema.Types.ObjectId,
-        ref: 'UserModel'
+        ref: 'User'
     }
 })
 
