@@ -5,13 +5,15 @@ import  bcrypt from "bcrypt";
 import { NextFunction, Response, Request } from "express";
 import jwt from "jsonwebtoken";
 import { inputValidation, userMiddleware } from "./middleware";
-import { ContentModel, UserModel } from "./db";
+import { ContentModel, LinkModel, UserModel } from "./db";
 import { JWT_PASSWORD } from "./config";
+import { randomHash } from "./utiles";
+
 const app = express();
 
 
 app.use(express.json());
-
+ 
 app.post("/api/v1/signup",  inputValidation, async (req: Request, res: Response)=> {
     const { username, password, email } = req.body;
 
@@ -128,7 +130,7 @@ app.delete("/api/v1/content", userMiddleware, async(req, res) => {
         res.status(200).json({ 
             message: "SuccessFully Deleted!!" 
         });
-        
+
     } catch (error) {
         console.error(error);
         res.json({
@@ -137,13 +139,71 @@ app.delete("/api/v1/content", userMiddleware, async(req, res) => {
     }
 });
 
-app.post("/api/v1/brain/share", (req, res) => {
+app.post("/api/v1/brain/share", userMiddleware, async(req, res) => {
+    const { share } = req.body;
+    const hash = randomHash(10);
+    //@ts-ignore
+    const userId = req.userId;
+    try{
+        if(share){
+            await LinkModel.create({
+                hash,
+                userId
+            })
+            res.json({
+                hash: hash,
+                massage: "link Created SuccessFully!!"
+            })
+        }
+        else {
+            await LinkModel.deleteOne({
+                userId
+            })
+            res.json({
+                massage: "link Deleted SuccessFully!!"
+            })
+        }
+    } catch(error){
+        res.json({
+            massage: "something want Wrong"
+        })
+    }
+});
+
+app.get("/api/v1/brain/:shareLink", async (req, res) => {
+    const { shareLink } = req.params
+
+    try{
+        const link = await LinkModel.findOne({
+            hash: shareLink
+        })
+
+        if(!link){
+            res.json({
+                massage: "Invalid Link"
+            })
+            return;
+        }
+        const user = await UserModel.findOne({
+            _id: link.userId
+        });
+        
+        const content = await ContentModel.find({
+            userId: link.userId
+        })
+
+        res.json({
+            username: user?.username,
+            content
+        })
+
+    } catch(error){
+        res.json({
+            massage: "Server Crush!!"
+        })
+    }
 
 });
 
-app.get("/api/v1/brain/:shareLink", (req, res) => {
 
-});
-
-
-app.listen(3000);
+app.listen(3001);

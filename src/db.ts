@@ -68,8 +68,11 @@ const linkSchema = new Schema({
         require: true
     },
     userId: {
+        //  type: mongoose.Types.ObjectId, ref: 'User'
         type: Schema.Types.ObjectId,
-        ref: 'User'
+        ref: 'User',
+        unique: true,
+        required: true
     }
 })
 
