@@ -50,17 +50,30 @@ app.post("/api/v1/signin", inputValidation, async (req, res) => {
     const {username, password} = req.body;
 
     try {
+        
         const user = await UserModel.findOne({
             username
         })
-        if(user){
-            const token = jwt.sign({
-                id: user._id
-            }, JWT_PASSWORD)
-            res.status(200).json({
-                token: token
-            })
-            return;
+
+        // password and user both are exist 
+        if((user) && (user?.password)){
+            const realPassword = await bcrypt.compare(password, user.password);
+
+            if(realPassword){
+                const token = jwt.sign({
+                    id: user._id
+                }, JWT_PASSWORD)
+                res.status(200).json({
+                    token: token
+                })
+                return;
+            } else {
+                res.json({
+                    message: "Password is Incorrect"!!
+                })
+                return;
+            }
+          
         }
         else {
             res.status(403).json({
@@ -206,4 +219,4 @@ app.get("/api/v1/brain/:shareLink", async (req, res) => {
 });
 
 
-app.listen(3001);
+app.listen(3000);
