@@ -8,10 +8,10 @@ import { inputValidation, userMiddleware } from "./middleware";
 import { ContentModel, LinkModel, UserModel } from "./db";
 import { JWT_PASSWORD } from "./config";
 import { randomHash } from "./utiles";
-
+import cors from 'cors';
 const app = express();
 
-
+app.use(cors());
 app.use(express.json());
  
 app.post("/api/v1/signup",  inputValidation, async (req: Request, res: Response)=> {
@@ -163,6 +163,7 @@ app.post("/api/v1/brain/share", userMiddleware, async(req, res) => {
                 hash,
                 userId
             })
+
             res.json({
                 hash: hash,
                 massage: "link Created SuccessFully!!"

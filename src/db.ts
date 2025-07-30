@@ -25,7 +25,7 @@ const userSchemea = new Schema({
 })
 
 
-const constentTypes = ['image', 'video', 'article', 'audio'];
+const constentTypes = ['Youtube', 'Document', 'X'];
 
 const contentSchema = new Schema({
     title: {
@@ -40,8 +40,7 @@ const contentSchema = new Schema({
 
     type: { 
         type: String, 
-        enum: constentTypes, 
-        require: true
+        enum: constentTypes,
     },
 
     tags: [{type: Schema.Types.ObjectId, ref:'Tag'}],
